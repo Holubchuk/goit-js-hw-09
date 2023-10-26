@@ -5,8 +5,53 @@ import Notiflix from 'notiflix';
 const startBtn = document.querySelector('[data-start]');
 startBtn.disabled = true;
 
-let intervalId;
-let targetDate;
+class Coutdown {
+  intervalId;
+  targetDate;
+  constructor() {}
+  start() {
+    if (this.targetDate) {
+      this.intervalId = setInterval(() => {
+        const currentTime = new Date();
+        const diff = this.targetDate - currentTime;
+
+        if (diff <= 0) {
+          clearInterval(this.intervalId);
+        } else {
+          const { days, hours, minutes, seconds } = this.convertMs(diff);
+
+          document.querySelector('[data-days]').textContent =
+            this.addLeadingZero(days);
+          document.querySelector('[data-hours]').textContent =
+            this.addLeadingZero(hours);
+          document.querySelector('[data-minutes]').textContent =
+            this.addLeadingZero(minutes);
+          document.querySelector('[data-seconds]').textContent =
+            this.addLeadingZero(seconds);
+        }
+      }, 1000);
+      startBtn.disabled = true;
+    }
+  }
+  addLeadingZero(value) {
+    return value.toString().padStart(2, '0');
+  }
+  convertMs(ms) {
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+
+    const days = Math.floor(ms / day);
+    const hours = Math.floor((ms % day) / hour);
+    const minutes = Math.floor(((ms % day) % hour) / minute);
+    const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+    return { days, hours, minutes, seconds };
+  }
+};
+
+const coutdown = new Coutdown();
 
 flatpickr('#datetime-picker', {
   enableTime: true,
@@ -20,51 +65,12 @@ flatpickr('#datetime-picker', {
       Notiflix.Notify.failure('Please choose a date in the future');
     } else {
       startBtn.disabled = false;
-      targetDate = selectedDate;
+      coutdown.targetDate = selectedDate;
       Notiflix.Notify.success('Well done');
     }
   },
 });
 
 startBtn.addEventListener('click', () => {
-  if (targetDate) {
-    intervalId = setInterval(updateTimer, 1000);
-    startBtn.disabled = true;
-  }
+  coutdown.start();
 });
-
-function updateTimer() {
-  const currentTime = new Date();
-  const diff = targetDate - currentTime;
-
-  if (diff <= 0) {
-    clearInterval(intervalId);
-  } else {
-    const { days, hours, minutes, seconds } = convertMs(diff);
-
-    document.querySelector('[data-days]').textContent = addLeadingZero(days);
-    document.querySelector('[data-hours]').textContent = addLeadingZero(hours);
-    document.querySelector('[data-minutes]').textContent =
-      addLeadingZero(minutes);
-    document.querySelector('[data-seconds]').textContent =
-      addLeadingZero(seconds);
-  }
-}
-
-function addLeadingZero(value) {
-  return value.toString().padStart(2, '0');
-}
-
-function convertMs(ms) {
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  const days = Math.floor(ms / day);
-  const hours = Math.floor((ms % day) / hour);
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
-
-  return { days, hours, minutes, seconds };
-}
