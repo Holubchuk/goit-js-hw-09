@@ -32,3 +32,9 @@ img {
 .value {
   font-size: 36px;
 }
+
+.form {
+  display: flex;
+  gap: 10px;
+  max-width: 50%;
+}
