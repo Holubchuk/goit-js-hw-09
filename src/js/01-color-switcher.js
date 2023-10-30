@@ -2,6 +2,14 @@ const startBtn = document.querySelector('[data-start]');
 const stopBtn = document.querySelector('[data-stop]');
 const body = document.querySelector('body');
 
+startBtn.style.position = "absolute";
+startBtn.style.top = "50%";
+startBtn.style.left = "48%";
+
+stopBtn.style.position = "absolute";
+stopBtn.style.top = "50%";
+stopBtn.style.left = "52%";
+
 let timerId;
 
 startBtn.addEventListener('click', () => {
